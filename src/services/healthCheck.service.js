@@ -1,19 +1,35 @@
-const timeFormat = require('../utils/convertSecondToTime');
-const healthTemplate = require('../utils/template');
+const convertTime = (sec) => {
+  const strSec = sec.toString()
+  const numberWOextention = strSec.split(".")
 
-//return an html page with the server status.
-const healthCheck = (_, res) => {
+  totalSecond = Number(numberWOextention[0]);
+  var h = Math.floor(totalSecond / 3600);
+  var m = Math.floor(totalSecond % 3600 / 60);
+  var s = Math.floor(totalSecond % 3600 % 60);
+
+  var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+  var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+  var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+
+  return hDisplay + mDisplay + sDisplay
+
+}
+
+const healthCheck = (req, res) => {
   const status = {
-    uptime: timeFormat(process.uptime()),
-    date: new Date().toLocaleDateString('he-IL', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    }),
+    uptime: convertTime(process.uptime()), //process.uptime(): module which is used to get the number of seconds the Node.js process is running
+    date: new Date().toLocaleDateString('en-US'
+      , {
+        day: 'numeric',
+        year: 'numeric',
+        month: 'long',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric'
+      }),
     status: 'Live',
   };
-  res.status(200).send(healthTemplate(status));
+  res.status(200).send(status);
 };
 
 module.exports = healthCheck;

@@ -1,5 +1,5 @@
-const playerModels = require('../models/players.models');
-const sessionModels = require('../models/sessions.models');
+const playerModels = require('../models/players_models');
+const sessionModels = require('../models/sessions_models');
 
 //update Guest Name in a game session by sessionID.
 const putGuestName = (req, res) => {

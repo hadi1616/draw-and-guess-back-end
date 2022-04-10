@@ -1,17 +1,17 @@
-const playersModels = require('../models/players.models');
-const sessionsModels = require('../models/sessions.models');
+const playersModels = require('../models/players_models');
+const sessionsModels = require('../models/sessions_models');
 
-//create a new session in DB with the host player name.
+//create a new session with the host name.
 const createNewSession = (req, res) => {
   const { playerName } = req.body;
 
   playersModels.setPlayerName(playerName)
     .then((playerId) => sessionsModels.setNewSession(playerId))
     .then((result) => res.status(200).send(result))
-    .catch((error) => res.status(500).send(error.message)); //internal server error
+    .catch((error) => res.status(500).send(error.message));
 };
 
-//update chosen word in spesific session, by sessionID
+//update chosen word in current session
 const putCorrectWord = (req, res) => {
   const { chosenWord, sessionId } = req.body;
   sessionsModels.updateChosenWord(sessionId, chosenWord)
@@ -24,7 +24,7 @@ const putCorrectWord = (req, res) => {
     });
 };
 
-//update chosen word in spesific session, by sessionID
+//update chosen draw in spesific session, 
 const putDrawings = (req, res) => {
   const { drawData, sessionId } = req.body;
   sessionsModels.updateDraw(sessionId, drawData)
@@ -40,8 +40,7 @@ const putDrawings = (req, res) => {
 //update winner name and score when the game session ends.
 const putWinnerInstances = (req, res) => {
   const { sessionId } = req.body;
-  sessionsModels
-    .updateWinnerInstances(sessionId)
+  sessionsModels.updateWinnerInstances(sessionId)
     .then(() => {
       res.status(200).send('success');
     })
@@ -51,7 +50,7 @@ const putWinnerInstances = (req, res) => {
     });
 };
 
-//get draw data
+//get draw 
 const getSavedDraw = (req, res) => {
   const { sessionId } = req.body;
   sessionsModels
@@ -65,37 +64,34 @@ const getSavedDraw = (req, res) => {
     });
 };
 
-//check a guessing attempt.
+//check both words
 const checkGuess = (req, res) => {
   const { sessionId, playerId, hostTurn, guessedWord } = req.body;
   sessionsModels.getChosenWord(sessionId)
     .then((correctWord) => {
-      //the check ignores case sensitivity.
+      //if we have correct word then we will update all the data(update score,switch players turns,reset drew image)
       if (correctWord.toLowerCase() === guessedWord.toLowerCase()) {
-        /*
-            if the word is correct then:
-              - get previous score.
-              - update score.
-              - switch players turns.
-              - reset drew image.
-              - response with ture value
-        */
+
         playersModels.getPlayerScore(playerId)
           .then((prevScore) => {
-            let score = 0;
+
+            let currentScore = 0;
+
             ((fetchedWord) => {
-              const length = fetchedWord.length;
-              if (length < 4) {
-                score = 1;
-              } else if (length >= 4 && length < 7) {
-                score = 3;
-              } else {
-                score = 5;
-              }
+
+              if (fetchedWord.length < 5)
+                currentScore = 1;
+
+              else if (fetchedWord.length >= 5 && fetchedWord.length < 6)
+                currentScore = 3;
+
+              else
+                currentScore = 5;
+
             })(guessedWord);
-            return prevScore + score;
+            return prevScore + currentScore;
           })
-          .then((score) => playersModels.updatePlayerScore(playerId, score))
+          .then((currentScore) => playersModels.updatePlayerScore(playerId, currentScore))
           .then(() => sessionsModels.updatePlayerTurn(sessionId, hostTurn))
           .then(() => sessionsModels.updateDraw(sessionId, null))
           .then(() => {
@@ -111,7 +107,7 @@ const checkGuess = (req, res) => {
     });
 };
 
-//get session info
+//geting session information
 const getSessionData = (req, res) => {
   const { sessionId } = req.body;
   sessionsModels.fetchSessionInfo(sessionId)
@@ -124,7 +120,7 @@ const getSessionData = (req, res) => {
     });
 };
 
-//update session status
+//updating session status
 const updateSessionStatus = (req, res) => {
   const { status, sessionId } = req.body;
   sessionsModels.fetchSessionStatus(sessionId, status)
@@ -140,7 +136,7 @@ const updateSessionStatus = (req, res) => {
     });
 };
 
-//get top ten scores in all games.
+//geting top ten scores in all games.
 const getTopTenPlayersScore = (req, res) => {
 
   sessionsModels.fetchTopTenScores()

@@ -1,6 +1,6 @@
 const db = require('../database/connection');
 
-//create new game session.
+//creating new game session.
 const setNewSession = (playerId) =>
   db
     .query(
@@ -14,7 +14,7 @@ const setNewSession = (playerId) =>
       };
     });
 
-//update guestID in a session according to it id.
+//update guestID in a session using his id.
 const updateGuestId = (sessionId, guestId) =>
   db
     .query(
@@ -25,21 +25,21 @@ const updateGuestId = (sessionId, guestId) =>
       return { guestId: rows[0].guest_player_id };
     });
 
-//update the chosen word in a session by sessionID
+//update the chosen word in a session using sessionID
 const updateChosenWord = (sessionId, pickedWord) =>
   db.query(`UPDATE sessions SET correct_word = ($1) WHERE sessions.id = ($2)`, [
     pickedWord,
     sessionId,
   ]);
 
-//update drawings in a session by sessionID
+//update drawings in a session using sessionID
 const updateDraw = (sessionId, drawData) =>
   db.query(`UPDATE sessions SET draw_data = ($1) WHERE sessions.id = ($2)`, [
     drawData,
     sessionId,
   ]);
 
-//update winner score and name in a game session by sessionID
+//updating winner score and name in a game session using sessionID
 const updateWinnerInstances = (sessionId) =>
   db
     .query(
@@ -69,7 +69,7 @@ const updateWinnerInstances = (sessionId) =>
       )
     );
 
-//get the saved draw from a session by sessionID.
+//geting the saved draw using sessionID .
 const fetchSavedDraw = (sessionId) =>
   db
     .query(`SELECT draw_data FROM sessions WHERE sessions.id = ($1)`, [
@@ -77,7 +77,7 @@ const fetchSavedDraw = (sessionId) =>
     ])
     .then(({ rows }) => rows[0].draw_data);
 
-//get the chosen word.
+//geting the chosen word.
 const getChosenWord = (sessionId) =>
   db
     .query(`SELECT correct_word FROM sessions WHERE sessions.id = ($1)`, [
@@ -115,30 +115,29 @@ const fetchSessionInfo = (sessionId) =>
       };
     });
 
-//update player's turn.
+//updating player's turn.
 const updatePlayerTurn = (sessionId, state) =>
   db.query(`UPDATE sessions SET host_turn = ($1) WHERE sessions.id = ($2)`, [
     state,
     sessionId,
   ]);
 
-//update session status.
+//updating session status.
 const fetchSessionStatus = (sessionId, sessionStatus) =>
   db.query(`UPDATE sessions SET status = ($1) WHERE sessions.id = ($2)`, [
     sessionStatus,
     sessionId,
   ]);
 
-//get top 10 score.
+//return top 10 players.
 const fetchTopTenScores = () =>
-  db
-    .query(
-      `SELECT winner_name, winner_score 
+  db.query(
+    `SELECT winner_name, winner_score 
     FROM sessions 
     WHERE winner_score > 0 
     ORDER BY winner_score DESC 
     LIMIT 10`
-    )
+  )
     .then(({ rows }) => rows);
 
 module.exports = {
