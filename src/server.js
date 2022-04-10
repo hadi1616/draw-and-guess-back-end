@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const sessionsControllers = require('./controllers/sessions_handler');
 const playersControllers = require('./controllers/players_handler');
-const healthCheck = require('./services/healthCheck.service');
+const healthCheck = require('./services/healthCheck');
 const router = express.Router();
 
 const app = express();
