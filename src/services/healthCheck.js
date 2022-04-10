@@ -18,15 +18,6 @@ const convertTime = (sec) => {
 const healthCheck = (req, res) => {
   const status = {
     uptime: convertTime(process.uptime()), //process.uptime(): module which is used to get the number of seconds the Node.js process is running
-    date: new Date().toLocaleDateString('en-US'
-      , {
-        day: 'numeric',
-        year: 'numeric',
-        month: 'long',
-        hour: 'numeric',
-        minute: 'numeric',
-        second: 'numeric'
-      }),
     status: 'Live',
   };
   res.status(200).send(status);
